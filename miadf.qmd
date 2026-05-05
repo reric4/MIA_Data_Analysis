@@ -1,14 +1,19 @@
 ---
 title: "MIA Data Analysis"
 author: "Ray Erickson"
-date: "Sys.Date()"
+date: today
 format:
   html:
-    theme: cyborg
+    theme: spacelab
+    backgroundcolor: "#E8DECC"
+    monobackgroundcolor: "#E0D7C8"
     toc: true
     toc-depth: 3
+    toc-location: left
     code-fold: false
+    code-overflow: wrap
     embed-resources: true
+    tabsets: true
 editor_options:
   markdown:
     wrap: none
@@ -19,17 +24,18 @@ jupyter: python3
 #Importing the needed libraries
 import pandas as pd
 import pyspark as pk
+import matplotlib.pyplot as plt
 
 #assign file path
 file = "AZ-ALWY.xlsx"
 
 ```
 
-# Project {.tabset}
-
-## Data Importing
-
-### Original Files
+# Project
+:::{.panel-tabset}
+## Data Importation & Cleaning
+:::{.panel-tabset}
+### Importing Original Files
 ```{python}
 byalph = pd.read_excel(file, "A-Z", index_col=None, na_values=["NA"]) 
 ```
@@ -99,14 +105,20 @@ cleaned.info()
 ```
 
 
-### Anonomize Data
+### Anonomizing Data
 
 
 ```{python}
 todrop = ["Last_Name", "First_Name", "Service_Number", "Unit", "Home_of_Record", "Rank"]
 anon = cleaned.drop(columns=todrop)
+
+anon["Date_of_Loss"]=pd.to_datetime(anon["Date_of_Loss"])
+anon["Year_of_Loss"]=anon["Date_of_Loss"].dt.year
+anon["Date_of_Loss"]=anon["Date_of_Loss"].dt.date
 ```
 Drop the names and service numbers in order to anonomize data, as well as Unit, since the unit data is not currently standardized and to do so would take massive amounts of time, and Home of Record since it is duplicated by state to a degree and state is a more accurate identifier, and Rank since its not standardized, nor currently in use in this analysis
+
+I am also making sure the `Date of Loss` column is in DateTime format and then making it only have the date not a unneeded time value, and adding a `Year of Loss` column for added analysis options
 ```{python}
 #| echo: false
 anon.info()
@@ -118,3 +130,108 @@ I then export the anonomized data to an excel sheet to simplify further actions.
 #| eval: false
 anon.to_excel("mia_anon.xlsx")
 ```
+
+:::
+
+## Data Aggregation
+
+First I am going to aggregate the data based upon the different main variables in order to make analysis easier at a later time. Additionally I am adding some additional reference values for sorting purposes
+``` {python}
+conflictcount = anon.groupby("Conflict").agg(Count=("State","count"))
+conflictcount["startyear"]=[1947,1950,1991,1986,2003,1955,1939]
+conflictcount["endyear"]=[1991,1953,1991,1986,2011,1975,1945]
+```
+```{python}
+#| echo: false
+print(conflictcount)
+```
+```{python}
+servicecount = anon.groupby("Service").agg(Count=("State","count"))
+```
+```{python}
+#| echo: false
+print(servicecount)
+```
+```{python}
+statecount = anon.groupby("State").agg(Count=("Conflict","count"))
+
+#showing first 10 alphabetically
+```
+```{python}
+#| echo: false
+print(statecount[:10])
+```
+```{python}
+yearcount = anon.groupby("Year_of_Loss").agg(Count=("State","count"))
+
+#showing first 10 chronologically
+```
+```{python}
+#| echo: false
+print(yearcount[:10])
+```
+```{python}
+datecount = anon.groupby("Date_of_Loss").agg(Count=("State","count"))
+
+#showing first 10 chronologically
+```
+```{python}
+#| echo: false
+print(datecount[:10])
+```
+```{python}
+locationcount = anon.groupby("Location").agg(Count=("State","count"))
+
+#showing first 10 alphabetically
+```
+```{python}
+#| echo: false
+print(locationcount[:10])
+```
+
+
+## Data Analysis & Visualization
+
+I am defining a function so that my pie chart percentages go with the titles on the legend for ease of reading
+```{python}
+def pielegpct(data, title):
+    pcts = (data/data.sum()*100).round(1)
+    leglab = [f"{label} ({pct}%)" for label, pct in zip(data.index, pcts)]
+    
+    plt.pie(data,labels=data.index, labeldistance=None)
+    plt.legend(leglab, bbox_to_anchor=(1,1.1), loc="upper left")
+    plt.title(title)
+    
+    plt.tight_layout(
+        )
+```
+
+
+```{python}
+#|echo: false
+
+cnfplt = conflictcount.sort_values("startyear",  ascending=False).plot(
+    title="Losses per Conflict",
+    kind="barh",
+    y="Count",
+    legend=False,
+    color="tan"
+    )
+for p in cnfplt.patches:
+    value = p.get_width()
+    cnfplt.annotate(
+        str(value),
+        (value, p.get_y() + p.get_height() / 2),
+        ha="left", va="center", xytext=(5, 0), textcoords="offset points")
+cnfplt.set_xlim( conflictcount["Count"].max() * 1.15, 0)
+cnfplt.invert_xaxis()
+```
+
+```{python}
+#| echo: false
+pielegpct(servicecount["Count"], "Distribution of Loss by Services")
+plt.show
+```
+
+
+:::

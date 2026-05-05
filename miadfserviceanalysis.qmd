@@ -1,0 +1,169 @@
+---
+title: "MIA Data Service Analysis"
+author: "Ray Erickson"
+date: today
+format:
+  html:
+    theme: spacelab
+    backgroundcolor: "#DCDCE3"
+    monobackgroundcolor: "#DEDEDE"
+    fontcolor: "black"
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    code-fold: false
+    code-overflow: wrap
+    embed-resources: true
+    tabsets: true
+editor_options:
+  markdown:
+    wrap: none
+jupyter: python3
+---
+```{python setup, include=FALSEE}
+#| echo: False
+#Importing the needed libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+import us
+import geopandas
+import pickle
+```
+
+# Service Analysis & Conclusion
+
+
+For this project you will need the `pandas`, `matplotlib.pyplot`, `us`, `geopandas`, and `re` libraries
+
+Also, due to the size of the data, this project is split into three files, so `pickle` is needed in order to export the variables from one doc to the other
+
+```{python}
+#|echo: false
+
+with open("miadfs.pkl", "rb") as f:
+  miadfs = pickle.load(f)
+
+afstmap = miadfs["afstmap"]
+armystmap = miadfs["armystmap"]
+navystmap = miadfs["navystmap"]
+mcstmap = miadfs["mcstmap"]
+otherstmap = miadfs["otherstmap"]
+aflocmap = miadfs["aflocmap"]
+armylocmap = miadfs["armylocmap"]
+navylocmap = miadfs["navylocmap"]
+mclocmap = miadfs["mclocmap"]
+otherlocmap = miadfs["otherlocmap"]
+```
+
+:::{.panel-tabset}
+
+## Analysis
+
+I am also combining the conflicts beside World War II, the Korean War, and the Vietnam War as well as the other services beside the Army, Air Force, Navy, and Marine Corps.
+
+:::{.panel-tabset}
+
+
+### Air Force
+
+```{python}
+#|echo: False
+print("Air Force Missing by State")
+
+afstmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+```{python}
+#|echo: False
+print("Air Force Missing by Location")
+
+aflocmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+### Army
+
+```{python}
+#|echo: False
+print("Army Missing by State")
+
+armystmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+```{python}
+#|echo: False
+print("Army Missing by Location")
+
+armylocmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+### Navy
+
+```{python}
+#|echo: False
+print("Navy Missing by State")
+
+navystmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+```{python}
+#|echo: False
+print("Navy Missing by Location")
+
+navylocmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+### Marine Corps
+
+```{python}
+#|echo: False
+print("Marine Corps Missing by State")
+
+mcstmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+```{python}
+#|echo: False
+print("Marine Corps Missing by Location")
+
+mclocmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+### Other Services
+
+```{python}
+#|echo: False
+print("Other Service Missing by State")
+
+otherstmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+```{python}
+#|echo: False
+print("Other Service Missing by Location")
+
+otherlocmap.explore(column="Missing", legend=True, cmap="YlOrRd", tiles="OpenStreetMap", tooltip=True)
+```
+
+
+:::
+
+
+## Conclusions
+
+World War II is overwhelmingly the originating conflict for the majority of MIA soldiers, as well as the highest percentage of loss for all of the services
+
+Overall the US Navy has the most MIA soldiers. 
+
+California overall has the most MIA soldiers, although New York has more MIA from World War II than California does
+
+California has the most MIA Navy and Marines, while New York has the most MIA Army, Air Force, and other services
+
+The Solomon Islands have the highest concentration of MIA missing, including the highest concentration of Marine Corps and Navy missing, as well as the highest concentration of World War II missing.
+
+North Korea has the highest concentration of both Korean War missing, and Army missing.
+
+Papua New Guinea has the highest concentration of Air Force missing.
+
+The highest concentration of missing from other conflicts is in Russia, while the highest concentration of missing from other services is Greenland.
+
+:::
