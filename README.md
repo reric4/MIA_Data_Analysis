@@ -3,7 +3,7 @@ Project Start 2/15/2026
 
 <i>Required Libraries: Python, Pandas, matplotlib.pyplot, us, re, geopandas</i> 
 
-<strong>To view the html files, go to this link (https://htmlpreview.github.io/), and paste the link to the html file. OR paste this link (http://htmlpreview.github.io/?) in front of the url when clicked on the html file.</strong>
+<b>To view the html files, go to this link (https://htmlpreview.github.io/), and paste the link to the html file. OR paste this link (http://htmlpreview.github.io/?) in front of the url when clicked on the html file.</b>
 
 <p> This project compares different trends or patterns within losses and conflicts and states of the United States Military, as documented by the DPAA in the form of lists of the Missing In Action soldiers and their information.
 	
