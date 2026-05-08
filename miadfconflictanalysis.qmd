@@ -15,12 +15,16 @@ format:
     code-overflow: wrap
     embed-resources: true
     tabsets: true
+    grid:
+      body-width: 2000px
+      sidebar-width: 200px
+      margin-width: 200px
 editor_options:
   markdown:
     wrap: none
 jupyter: python3
 ---
-```{python setup, include=FALSEE}
+```{python setup}
 #| echo: False
 #Importing the needed libraries
 import pandas as pd
